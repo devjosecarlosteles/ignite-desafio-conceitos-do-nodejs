@@ -87,7 +87,15 @@ app.put('/todos/:id', checksExistsUserAccount, (req, res) => {
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (req, res) => {
-  // Complete aqui
+  const id = req.params.id;
+
+  req.user[0].todos.map((item) => {
+    if(item.todo.id === id) {
+      item.todo.done = true;
+    }
+  })
+
+  res.status(201).send();
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (req, res) => {
