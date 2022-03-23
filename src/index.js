@@ -13,12 +13,13 @@ function checksExistsUserAccount(req, res, next) {
   const { username } = req.headers;
 
   const user = users.map((item) => {
-    item.username === username ? item : null
+    if(item.username === username) return item
   })
 
   if(user.length > 0) {
-    req.todos = user.todos
-    next()
+    req.user = user;
+
+    return next();
   }
 
   res.status(400).json({ err: "user not found!" })
@@ -45,7 +46,7 @@ app.get('/todos', checksExistsUserAccount, (req, res) => {
   const { username } = req.headers;
 
   users.map((item) => {
-    if (item.username === username) return res.status(200).json({ todos: item.todos });
+    if (item.username === username) return res.status(200).json({ todos: item });
   })
 
 });
@@ -72,7 +73,17 @@ app.post('/todos', checksExistsUserAccount, (req, res) => {
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (req, res) => {
-  
+  const { title, deadline } = req.body;
+  const id = req.params.id 
+
+  req.user[0].todos.map((item) => {
+    if(item.todo.id === id) {
+      item.todo.title = title
+      item.todo.deadline = deadline
+    }
+  })
+
+  res.status(201).send()
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (req, res) => {
