@@ -28,6 +28,12 @@ function checksExistsUserAccount(req, res, next) {
 app.post('/users', (req, res) => {
   const { name, username } = req.body
 
+  const userAlreadyExists = users.some((user) => user.username === username)
+
+  if(userAlreadyExists) return res.status(400).json({
+    error: 'Mensagem do erro'
+  })
+
   const id = uuidv4()
 
   const user = {
