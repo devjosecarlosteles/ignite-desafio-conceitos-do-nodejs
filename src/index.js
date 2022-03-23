@@ -2,9 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const { v4: uuidv4 } = require("uuid")
 
-
-// const { v4: uuidv4 } = require('uuid');
-
 const app = express();
 
 app.use(cors());
@@ -19,7 +16,7 @@ function checksExistsUserAccount(req, res, next) {
     item.username === username ? item : null
   })
 
-  if(user) {
+  if(user.length > 0) {
     req.todos = user.todos
     next()
   }
@@ -48,17 +45,34 @@ app.get('/todos', checksExistsUserAccount, (req, res) => {
   const { username } = req.headers;
 
   users.map((item) => {
-    if (item.username === username) return res.status(200).json(item.todos)
+    if (item.username === username) return res.status(200).json({ todos: item.todos });
   })
 
 });
 
 app.post('/todos', checksExistsUserAccount, (req, res) => {
-  res.status(200).json(req.todos);
+  const { title, deadline } = req.body;
+  const { username } = req.headers;
+
+  const id = uuidv4()
+
+  const todo = {
+    id,
+    title,
+    done: false,
+    deadline: new Date(deadline),
+    created_at: new Date()
+  }
+
+  users.forEach((item) => {
+    item.username ===  username ? item.todos.push({ todo }) : null
+  })
+
+  res.status(201).json({ todo: todo })
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (req, res) => {
-  // Complete aqui
+  
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (req, res) => {
